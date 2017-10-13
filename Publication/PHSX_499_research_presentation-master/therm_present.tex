@@ -1,0 +1,94 @@
+\documentclass[landscape,xcolor={table},10pt]{beamer}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usetheme{Antibes}
+\usepackage{tikz}
+\usepackage{multimedia}
+\usepackage{textpos}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{siunitx}
+
+\usetheme{default}
+\usecolortheme{seahorse}
+\usefonttheme[onlymath]{serif}
+\setbeamertemplate{caption}[numbered]
+\graphicspath{ {images/} }
+
+\setbeamertemplate{title page}{
+
+        \begin{picture}(0,0)
+
+            
+
+            \put(-168,-100){%
+                \begin{minipage}[b][45mm][t]{226mm}
+                
+                	\centering
+               
+                  {\usebeamerfont{title}\color{black}\inserttitle \par}
+                  
+                  \color{black}\insertauthor
+                  
+                  \insertinstitute
+                  
+                  \insertdate
+                  
+                
+                  
+                \end{minipage}
+            }
+
+            \end{picture}
+            
+           
+
+    }
+
+\title[...]{\includegraphics[width=2cm]{images/moses_logo_with_text}  \\Analysing the Spectral Content of MOSES Images \\Using Cross Correlation}
+\author[Parker]{Jake Parker}
+\institute{}
+\date{July 22nd, 2015 \\ }
+
+\addtobeamertemplate{frametitle}{}{%
+\begin{textblock*}{100mm}(.45\textwidth,-1.7cm)
+
+\end{textblock*}}
+
+	
+\begin{document}
+
+	\begin{frame}[plain]
+	        \titlepage
+	\end{frame}
+	
+	\begin{frame}
+		
+		\frametitle{Cross Correlation}
+\\Continuous Definition			
+			\begin{itemize}
+				\item $ (f \otimes g) (z) \equiv \int_{-\infty}^{\infty} f^*(x) g(x+z) dx$
+				\item $(f \otimes g) (z) \equiv \mathcal{F}^{-1} \lbrace \tilde{f}^* (k) \tilde{g}(k)\rbrace$
+			\end{itemize}
+			
+\\Finite Definition
+	\begin{itemize}
+		\item 
+	\end{itemize}
+			
+	
+
+	\end{frame}
+	
+	
+\end{document}
+
+
+
+
+
+
+
+
