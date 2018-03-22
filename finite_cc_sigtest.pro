@@ -1,6 +1,6 @@
 ;the following must be run inorder to run this program
 
-;; .r moses_super_exposure
+restore, 'moses_super.sav'
 
 
 ;find the power spectrum of vertical columns, average them together,
