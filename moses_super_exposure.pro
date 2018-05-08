@@ -11,6 +11,20 @@
 
 restore, 'mosesAlignFinal.sav'
 
+;;; Test that this procedure does the same thing to all three cubes in a couple different ways.
+
+;test = cube_plus
+;test1 = cube_minus
+
+;cube_minus = test
+;cube_plus = test1
+
+;cube_plus = cube_zero
+;cube_minus = cube_zero
+
+
+
+; grab the cube size
 cubesz = size(cube_zero)
 
 ;pick out saturated pixels that are marked as NANs
@@ -18,7 +32,6 @@ cubesz = size(cube_zero)
 fzero = finite(cube_zero)
 fplus = finite(cube_plus)
 fminus = finite(cube_minus)
-
 
 
 ;form version of cube with zeros in place of saturated pixels
@@ -57,7 +70,7 @@ super_minus = total(f_cube_minus,3)/total(median_minus,3)
 
 badpixp=where(finite(super_plus,/nan))
 badpixm=where(finite(super_minus,/nan))
-badpixtotal = [badpixp,badpixm]
+badpixtotal = [badpixm,badpixp]
 
 super_plus(badpixtotal)=0
 super_zero(badpixtotal)=0
