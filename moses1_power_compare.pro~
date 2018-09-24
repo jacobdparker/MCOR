@@ -1,0 +1,59 @@
+;; restore,'mosesAlignFinal.sav'
+
+;;   plus = cube_plus[*,*,0]
+;;   plus[where(finite(plus,/NAN))]=0
+;;   plus /= median(plus)
+;;   plus_power = abs(FFT(plus,dimension=2))
+
+;;   zero = cube_zero[*,*,0]
+;;   zero[where(finite(zero,/NAN))]=0
+;;   zero_power = abs(FFT(zero,dimension=2))
+
+;;   minus = cube_minus[*,*,0]
+;;   minus[where(finite(minus,/NAN))]=0
+;;   minus_power = abs(FFT(minus,dimension=2))
+
+ 
+
+;;   ;sort 
+;;   for i=0,n_elements(minus_power(0,*))-1 do minus_power(*,i) = minus_power(sort(minus_power(*,i)),i)
+;;   for i=0,n_elements(plus_power(0,*))-1 do plus_power(*,i) = plus_power(sort(plus_power(*,i)),i)
+;;   for i=0,n_elements(zero_power(0,*))-1 do zero_power(*,i) = zero_power(sort(zero_power(*,i)),i)
+
+
+;;   j = 100
+;;   p = plot( plus_power[j,*],/ylog)
+;;   p = plot( minus_power[j,*],/overplot,color = 'red',/ylog)
+;;   p = plot( zero_power[j,*],/overplot,color = 'blue',/ylog)
+
+
+
+
+
+
+
+restore,'moses_super.sav'
+
+plus_power = abs(FFT(super_plus,dimension=2))
+minus_power = abs(FFT(super_minus,dimension=2))
+zero_power = abs(FFT(super_zero,dimension=2))
+
+;sort 
+for i=0,n_elements(minus_power(0,*))-1 do minus_power(*,i) = minus_power(sort(minus_power(*,i)),i)
+for i=0,n_elements(plus_power(0,*))-1 do plus_power(*,i) = plus_power(sort(plus_power(*,i)),i)
+for i=0,n_elements(zero_power(0,*))-1 do zero_power(*,i) = zero_power(sort(zero_power(*,i)),i)
+
+
+j = 100
+;; p = plot( plus_power[j,*],/ylog)
+;; p = plot( minus_power[j,*],/overplot,color = 'red',/ylog)
+;; p = plot( zero_power[j,*],/overplot,color = 'blue',/ylog)
+
+p = plot(mean(plus_power[*,*],dimension=1),/ylog)
+p = plot(mean(minus_power[*,*],dimension=1),/overplot,color = 'red',/ylog)
+p = plot(mean(zero_power[*,*],dimension=1),/overplot,color = 'blue',/ylog)
+
+
+
+end
+

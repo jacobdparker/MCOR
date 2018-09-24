@@ -9,7 +9,7 @@ The IDL routine 'moses_super_exporsure.pro' requires mosesAlignFinal.sav (a coal
 Plots of these super exposures are generated through 'moses_super_plot.pro'.  This saves the plus, zero, and plus-zero images with a uniform image scaling and draws some green boxes around interesting areas.
 
 #Cross Correlation
-... this part is extra bad.  mcor.sav is the cross-correlation function that I used for all forward modeling.  As far as I can tell sigtest_plot.pro will tell me everything I need to know if I can just parse through it.
+... this part is really bad.  mcor.sav is the cross-correlation function that I used for all forward modeling.  As far as I can tell sigtest_plot.pro will tell me everything I need to know if I can just parse through it.
 
 
 

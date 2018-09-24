@@ -1,50 +1,100 @@
-;run moses_super_exposure
+restore, 'moses_super.sav'
 
 ; Read in all of the eit image from the MOSES launch
-eit_prep,'/disk/data/jparker/moses_eit/efz20060208.130013',index,i171
-read_eit,'/disk/data/jparker/moses_eit/efz20060208.130013',i171_h
 
-eit_prep,'/disk/data/jparker/moses_eit/efz20060208.130609',index,i284
-read_eit,'/disk/data/jparker/moses_eit/efz20060208.130609',i284_h
+read_eit,'/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.184020',index,data
+data = iris_prep_despike(data)
+eit_prep,index,i304_h,i304,data=data
 
-eit_prep,'/disk/data/jparker/moses_eit/efz20060208.131348',index,i195
-read_eit,'/disk/data/jparker/moses_eit/efz20060208.131348',i195_h
-
-eit_prep,'/disk/data/jparker/moses_eit/efz20060208.131938',index,i304
-read_eit,'/disk/data/jparker/moses_eit/efz20060208.131938',i304_h
+read_eit,'/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.190014',index,data
+data = iris_prep_despike(data)
+eit_prep,index,i171_h,i171,data=data
 
 
-i304 = congrid(i304,4512,4512)
-i304 = i304(0:4095,0:4095)
+read_eit,'/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.182651',index,data
+data = iris_prep_despike(data)
+eit_prep,index,i284_h,i284,data=data
+
+read_eit,'/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.183429',index,data
+data = iris_prep_despike(data)
+eit_prep,index,i195_h,i195,data=data
+
+;form maps for each wavelength
+index2map,i304_h,i304,m304
+index2map,i171_h,i171,m171
+index2map,i195_h,i195,m195
+index2map,i284_h,i284,m284
+
+
+;rotate all maps to match image 13 of MOSES sequence (rotate to
+;18:48:19 UT)
+m304 = drot_map(m304,.1458,/keep_limb)
+m171 = drot_map(m171,-.1858,/keep_limb)
+m195 = drot_map(m195,.2433,/keep_limb)
+m284 = drot_map(m284,.3706,/keep_limb)
+
+;rebin maps to match MOSES
+moses_resolution = .59 ;arcsec per pix
+eit_sz = size(i304)
+scale = i304_h.cdelt1/moses_resolution
+newdim = floor(scale*eit_sz[1])
+
+m171 = rebin_map(m171,newdim,newdim)
+m195 = rebin_map(m195,newdim,newdim)
+m284 = rebin_map(m284,newdim,newdim)
+m304 = rebin_map(m304,newdim,newdim)
+
+;Co-Align and Modify Maps
 
 ;pad super_zero
-pad_z = fltarr(4096,4096)
+pad_z = fltarr(newdim,newdim)
 pad_z(0,0) = super_zero
 
 ;correlate both images
-cor = convol_fft(i304,pad_z,/correlate)
-cor = shift(cor,[-2047,-2047])
+cor = convol_fft(m304.data,pad_z,/correlate)
+cor = shift(cor,[-(newdim/2-1),-(newdim/2-1)])
 
 m = array_indices(pad_z,where(cor eq max(cor)))
 
-i304= shift(i304,[-m(0),-m(1)])
-i304=i304(*,0:1023)
+;m=[587,1763] ;result of above corelation to speed things up
 
-i171 = congrid(i171,4512,4512)
-i171 = i171(0:4095,0:4095)
+m171.data= shift(m171.data,[-m(0),-m(1)])
+m284.data= shift(m284.data,[-m(0),-m(1)])
+m195.data= shift(m195.data,[-m(0),-m(1)])
+m304.data= shift(m304.data,[-m(0),-m(1)])
 
-i284 = congrid(i284,4512,4512)
-i284 = i284(0:4095,0:4095)
 
-i195 = congrid(i195,4512,4512)
-i195 = i195(0:4095,0:4095)
+x = get_map_xp(m304)
+x = shift(x,[-m(0),-m(1)])
+y = get_map_yp(m304)
+y = shift(y,[-m(0),-m(1)])
 
-i171= shift(i171,[-m(0),-m(1)])
-i171=i171(*,0:1023)
+x = x[0:2047,0:1023]
+y = y[0:2047,0:1023]
 
-i195= shift(i195,[-m(0),-m(1)])
-i195=i195(*,0:1023)
+save,x,y,filename='mosesI_pointing.sav'
 
-i284= shift(i284,[-m(0),-m(1)])
-i284=i284(*,0:1023)
+
+
+
+;Display EIT images in the appropriate color scale and save them
+
+eit_colors,171,r,g,b
+eit_171 = image(alog10(m171.data[0:2047,0:1023]>.1<200),x,y,rgb_table = [[r],[g],[b]],axis_style = 1,buffer=1,title= 'SOHO EIT 171 '+i171_h.date_obs,xtitle = 'X (arcsec)',ytitle = 'Y (arcsec)',xshowtext=0)
+eit_colors,284,r,g,b
+eit_284 = image(alog10(m284.data[0:2047,0:1023]>.001<50),x,y,rgb_table = [[r],[g],[b]],axis_style = 1,buffer=1,title= 'SOHO EIT 284 '+i284_h.date_obs,xtitle = 'X (arcsec)',ytitle = 'Y (arcsec)',xshowtext=0)
+eit_colors,195,r,g,b
+eit_195 = image(alog10(m195.data[0:2047,0:1023]>.001<200),x,y,rgb_table = [[r],[g],[b]],axis_style = 1,buffer=1,title= 'SOHO EIT 195 '+i195_h.date_obs,xtitle = 'X (arcsec)',ytitle = 'Y (arcsec)',xshowtext=0)
+eit_colors,304,r,g,b
+eit_304 = image(alog10(m304.data[0:2047,0:1023]>.001<200),x,y,rgb_table = [[r],[g],[b]],axis_style = 1,buffer=1,title= 'SOHO EIT 304 '+i304_h.date_obs,xtitle = 'X (arcsec)',ytitle = 'Y (arcsec)')
+
+
+
+eit_171.save, "../MCOR_Paper_Overleaf/eit_171.eps"
+eit_195.save, "../MCOR_Paper_Overleaf/eit_195.eps"
+eit_284.save, "../MCOR_Paper_Overleaf/eit_284.eps"
+eit_304.save, "../MCOR_Paper_Overleaf/eit_304.eps"
+
+
+
 end

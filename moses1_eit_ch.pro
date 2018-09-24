@@ -81,9 +81,9 @@ ar_int_minus = ar.lines.int*ar_minus_throughput
 ;plot,ar.lines.wvl,ar_int_zero,psym=2
 
 
-;eit image peak ion_eq temp in order 171 195 284 304 in log T
+;eit image peak ion_eq temp in order 304 171 195 284 in log T
 
-temps=[4.7,6,6.2,6.35]
+temps=[4.7,5.85,6.2,6.35]
 
 ;pull relevent info from chianti struct
 

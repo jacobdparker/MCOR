@@ -1,8 +1,10 @@
-N=5000
+N=10000
 
 
   confidence=.9999
   freedom = 5.
+
+restore, 'moses_super.sav'
 
 ;alpha determines the confidence interval of interest
 alpha = (1-confidence)^(1/freedom)/2
