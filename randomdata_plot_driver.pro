@@ -15,6 +15,7 @@ alpha = .1
 z_rand = randomdata(super_zero,super_minus,super_plus,N,s,e,/long,p_rand=p_rand,m_rand=m_rand)
 
 ;compare randomdata power spectra to moses columns
+
 randomdata_plot,m_rand,super_minus,alpha,s,e,start,/power,/window,/auto
 ;randomdata_plot,p_rand,super_plus,alpha,s,e,start,/power,/window
 ;randomdata_plot,z_rand,super_zero,alpha,s,e,start,/power,/window
