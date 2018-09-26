@@ -1,23 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import code
+
+
+#set plot size
+plt.rcParams.update({'font.size': 14})
+
 
 #build x-axis
 rnge = 500
-x = np.linspace(-rnge,rnge,rnge*100)
-
-#Define a gaussian function internally that takes three arguments
-def gaussian(x,shift,sigma,int,center):
-    return int*np.exp(-(x -center - shift) ** 2 / (2 * sigma))
-
-#build arrays of parameters for objects being plotted
-sigma = np.array([200., 200., 200., 200.,75.,75., 50.,20,10,5,10])
-shift = np.array([0, -17.,300.,320.,0,-17,0,0,0,0,0])
-int = np.array([10,4,.8,.5,10,4,10,1,2,1,3])
-center = np.array([0,0,0,0,120,120,-150,300,-300,200,170])
-color = ['blue','red','orange','green','blue','red','blue','b','b','b','b']
-
-
+resolution = 1
+x = np.linspace(-rnge,rnge,rnge*resolution+1)
 
 #start by building and plotting three orders: plus, zero, minus
 fig1 = plt.figure()
@@ -27,39 +19,74 @@ plot_plus = fig2.add_subplot(111)
 fig3 = plt.figure()
 plot_minus = fig3.add_subplot(111)
 
-#keep track of total symbols
-t_zero = np.zeros_like(x)
-t_plus = np.zeros_like(x)
-t_minus = np.zeros_like(x)
+#Define a gaussian function internally that takes three arguments
+def gaussian(x,shift,sigma,int,center):
+    return int*np.exp(-(x -center - shift) ** 2 / (2 * sigma))
+
+#build red noise background for all orders
+mu = 0
+sigma = .1
+white_noise = np.random.normal(mu,sigma,np.size(x))
+white_noise[0] = 4  #set background noise value
+red = np.cumsum(white_noise)
+
+#start each order with a red noise background (boring, stationary He II)
+#and add He II features to background
+zero = red + gaussian(x, 0, 200, 10, 0) + gaussian(x, 0, 100, 10, 300)
+plus = np.copy(zero)
+minus = np.copy(zero)
+
+#add He II to plots
+plot_zero.plot(x, zero,color = 'b',label = 'He II')
+plot_plus.plot(x, plus,color = 'b',label = 'He II')
+plot_minus.plot(x,minus,color = 'b',label = 'He II')
+
+
+#build arrays of parameters for spectral contam features
+sigma = np.array([200., 200., 200.,200.])
+shift = np.array([-17, 200.,150.,170.])
+int = np.array([2,.8,.5,1])
+center = np.array([0,0,0,0])
+color = ['red','orange','green','purple']
+labels = ['Si XI','Contam','Contam','Contam']
+
+#initialize total signal for each channel
+t_zero = np.copy(zero)
+t_plus = np.copy(zero)
+t_minus = np.copy(zero)
+
+#add spectral contam to plots
 
 
 for i in range(len(sigma)):
-    zero = gaussian(x, shift[0], sigma[i], int[i],center[i])
+    zero = gaussian(x, 0, sigma[i], int[i],center[i])
     plus = gaussian(x, shift[i], sigma[i], int[i],center[i])
     minus = gaussian(x, -shift[i], sigma[i], int[i],center[i])
-    plot_zero.plot(x, zero,color = color[i])
-    plot_plus.plot(x, plus,color = color[i])
-    plot_minus.plot(x,minus,color = color[i])
+    plot_zero.plot(x, zero,color = color[i],label = labels[i])
+    plot_plus.plot(x, plus,color = color[i],label = labels[i])
+    plot_minus.plot(x,minus,color = color[i],label = labels[i])
     t_zero += zero
     t_plus += plus
     t_minus += minus
 
-plot_zero.plot(x,t_zero,color = 'black')
-plot_plus.plot(x,t_plus,color = 'black')
-plot_minus.plot(x,t_minus,color='black')
+plot_zero.plot(x,t_zero,color = 'black',label='Total Signal')
+plot_plus.plot(x,t_plus,color = 'black',label='Total Signal')
+plot_minus.plot(x,t_minus,color='black',label='Total Signal')
 
+#build cc x-axis for plotting
+x_cc = np.linspace(-(np.size(x)*2-1),np.size(x)*2-1,np.size(x)*resolution*2-1)
 
 #cross correlate each channel
-cc_pz = np.correlate(t_plus,t_zero, mode='same')
-cc_mz = np.correlate(t_minus,t_zero, mode='same')
-
+cc_pz = np.correlate(t_plus,t_zero, mode='full')
+cc_mz = np.correlate(t_minus,t_zero, mode='full')
 fig4 = plt.figure()
 cc_pz_plot = fig4.add_subplot(111)
 fig5 = plt.figure()
 cc_mz_plot = fig5.add_subplot(111)
 
-cc_pz_plot.plot(x,cc_pz,color='black')
-cc_mz_plot.plot(x,cc_mz,color='black')
+#... and plot each cross_correlation
+cc_pz_plot.plot(x_cc,cc_pz,color='black')
+cc_mz_plot.plot(x_cc,cc_mz,color='black')
 
 #plot subtracted images
 fig6 = plt.figure()
@@ -78,9 +105,51 @@ mz_plot.plot(x,mz,'black')
 fig8 = plt.figure()
 cc_pzmz_plot = fig8.add_subplot(111)
 
-cc_pzmz = np.correlate(pz,mz, mode='same')
-cc_pzmz_plot.plot(x,cc_pzmz,'black')
+cc_pzmz = np.correlate(pz,mz, mode='full')
+cc_pzmz_plot.plot(x_cc,cc_pzmz,'black')
 
+
+#add a bunch of shit to the figures
+plot_zero.set_title('M=0 order')
+plot_plus.set_title('M=1 order')
+plot_minus.set_title('M=-1 order')
+pz_plot.set_title('M=1 minus M=0')
+mz_plot.set_title('M=-1 minus M=1')
+
+
+plot_zero.set_xlabel('x (pixels)')
+plot_plus.set_xlabel('x (pixels)')
+plot_minus.set_xlabel('x (pixels)')
+
+# plot_zero.set_ylabel('Intensity')
+# plot_plus.set_ylabel('Intensity')
+# plot_minus.set_ylabel('Signal')
+
+plot_zero.legend()
+plot_minus.legend()
+plot_plus.legend()
+
+pz_plot.set_xlabel('x (pixels)')
+mz_plot.set_xlabel('x (pixels)')
+
+cc_mz_plot.set_xlabel('Lag (pixels)')
+cc_mz_plot.set_ylabel('Cross-Correlation')
+cc_pz_plot.set_xlabel('Lag (pixels)')
+cc_pz_plot.set_ylabel('Cross-Correlation')
+cc_pzmz_plot.set_xlabel('Lag (pixels)')
+cc_pzmz_plot.set_ylabel('Cross-Correlation')
+
+#label all the figures
+fig1.text(0,.9,'b)')
+fig2.text(0,.9,'c)')
+fig3.text(0,.9,'a)')
+fig4.text(0,.9,'d)')
+fig5.text(0,.9,'e)')
+fig6.text(0,.9,'g)')
+fig7.text(0,.9,'f)')
+fig8.text(0,.9,'h)')
+
+#save the figures!!!
 plt.tight_layout()
 fig1.savefig('fig1.pdf', bbox_inches='tight')
 fig2.savefig('fig2.pdf', bbox_inches='tight')
@@ -90,7 +159,6 @@ fig5.savefig('fig5.pdf', bbox_inches='tight')
 fig6.savefig('fig6.pdf', bbox_inches='tight')
 fig7.savefig('fig7.pdf', bbox_inches='tight')
 fig8.savefig('fig8.pdf', bbox_inches='tight')
-
 
 
 
