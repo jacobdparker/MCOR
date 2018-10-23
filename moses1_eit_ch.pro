@@ -52,6 +52,8 @@ close,4
 
 ;interpolate to wavelength grid from chianti
 
+;NOTE: ar.lines(*).wvl are not in order.  I hope what the following steps are doing is comparing the uniform transmission files and assigning a through put value for each position in wavelength as listed by Chianti.  Time will tell...
+
 ar_wvl = ar.lines(*).wvl
 
 ar_filter1 = interpol(filter1(1,*),filter1(0,*)*10,ar_wvl)

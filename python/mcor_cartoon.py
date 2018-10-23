@@ -113,8 +113,11 @@ cc_pzmz_plot.plot(x_cc,cc_pzmz,'black')
 plot_zero.set_title('M=0 order')
 plot_plus.set_title('M=1 order')
 plot_minus.set_title('M=-1 order')
-pz_plot.set_title('M=1 minus M=0')
-mz_plot.set_title('M=-1 minus M=1')
+pz_plot.set_title('M=1 minus M=0 (PZ)')
+mz_plot.set_title('M=-1 minus M=0 (MZ)')
+cc_pzmz_plot.set_title('PZ Cross-Correlated w/ MZ')
+cc_pz_plot.set_title('Cross-Correlation of M=1 and M=0')
+cc_mz_plot.set_title('Cross-Correlation of M=-1 and M=0')
 
 
 plot_zero.set_xlabel('x (pixels)')
@@ -141,13 +144,13 @@ cc_pzmz_plot.set_ylabel('Cross-Correlation')
 
 #label all the figures
 fig1.text(0,.9,'b)')
-fig2.text(0,.9,'c)')
-fig3.text(0,.9,'a)')
+fig2.text(0,.9,'a)')
+fig3.text(0,.9,'c)')
 fig4.text(0,.9,'d)')
 fig5.text(0,.9,'e)')
-fig6.text(0,.9,'g)')
-fig7.text(0,.9,'f)')
-fig8.text(0,.9,'h)')
+fig6.text(0,.9,'d)')
+fig7.text(0,.9,'e)')
+fig8.text(0,.9,'f)')
 
 #save the figures!!!
 plt.tight_layout()

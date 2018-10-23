@@ -1,0 +1,13 @@
+;build a basis of synthetic spectra for MCOR forward model
+
+;build a list of .dem files
+
+dems = file_search(./custom_dem/T*.dem
+
+;call chianti with specfici input parameters
+
+wmin = 280
+wmax = 340
+density = 1e9
+
+ch_synthetic, wmin, wmax, density = density, output = line_list

@@ -6,7 +6,10 @@ Since I did a shitty job of documenting my work I get to do it retroactively.  M
 #Forming Time Averaged Difference Images
 The IDL routine 'moses_super_exporsure.pro' requires mosesAlignFinal.sav (a coaligned and reduced version of the MOSESI dataset).  Script output is moses_super.sav which contains super_zero, super_minus, and super_plus (a single image in each order with no saturated pixels.  More documentation within.
 
-Plots of these super exposures are generated through 'moses_super_plot.pro'.  This saves the plus, zero, and plus-zero images with a uniform image scaling and draws some green boxes around interesting areas.
+Plots of these super exposures are generated through 'moses_super_plot.pro'.  This saves the plus, zero, and plus-zero images with a uniform image scaling and draws some green boxes around interesting areas. Note:  I beilieve that image labeling is now all done in Latex, not by this script.
+
+#Co-aligned EIT images
+All done by running moses_eit.pro.  This takes the 4 full disk EUV images take by EIT close to launch and then despikes, rotates, and rebins to match MOSES FOV and resolution.  Final versions then saved in moses_eit.sav.
 
 #Cross Correlation
 ... this part is really bad.  mcor.sav is the cross-correlation function that I used for all forward modeling.  As far as I can tell sigtest_plot.pro will tell me everything I need to know if I can just parse through it.

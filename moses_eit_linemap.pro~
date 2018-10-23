@@ -1,0 +1,12 @@
+; build an eit_line map for the MOSES I launch
+
+f171 = '/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.190014'
+f195 = '/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.183429'
+f284 = '/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.182651'
+f304 = '/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.184020'
+
+eqion = '/usr/local/ssw/packages/chianti/dbase/ioneq/chianti.ioneq'
+
+eit_dem_tool,[f171,f195,f284,f304],dem_map,temp
+
+end

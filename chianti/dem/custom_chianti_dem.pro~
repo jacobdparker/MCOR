@@ -1,0 +1,11 @@
+;make a grid in log T from 4 to 7
+
+logT = findgen(31)/8+4
+logT_extent = logT[-1] - logT[0]
+
+
+basis_elements = 3
+
+
+;make a triangle function
+width = logT_extent/basis_elements

@@ -33,6 +33,10 @@ m171 = drot_map(m171,-.1858,/keep_limb)
 m195 = drot_map(m195,.2433,/keep_limb)
 m284 = drot_map(m284,.3706,/keep_limb)
 
+;save a processed cube for moses_eit_linemap
+eit_cube = [[[m171.data]],[[m195.data]],[[m284.data]],[[m304.data]]]
+save,eit_cube,filename='eit_cube_prepped.sav'
+
 ;rebin maps to match MOSES
 moses_resolution = .59 ;arcsec per pix
 eit_sz = size(i304)
@@ -64,6 +68,8 @@ m195.data= shift(m195.data,[-m(0),-m(1)])
 m304.data= shift(m304.data,[-m(0),-m(1)])
 
 
+
+
 x = get_map_xp(m304)
 x = shift(x,[-m(0),-m(1)])
 y = get_map_yp(m304)
@@ -90,10 +96,20 @@ eit_304 = image(alog10(m304.data[0:2047,0:1023]>.001<200),x,y,rgb_table = [[r],[
 
 
 
-eit_171.save, "../MCOR_Paper_Overleaf/eit_171.eps"
-eit_195.save, "../MCOR_Paper_Overleaf/eit_195.eps"
-eit_284.save, "../MCOR_Paper_Overleaf/eit_284.eps"
-eit_304.save, "../MCOR_Paper_Overleaf/eit_304.eps"
+eit_171.save, "../MCOR_Paper/eit_171.eps"
+eit_195.save, "../MCOR_Paper/eit_195.eps"
+eit_284.save, "../MCOR_Paper/eit_284.eps"
+eit_304.save, "../MCOR_Paper/eit_304.eps"
+
+;add new images to idl save file for future use.
+
+i171 = m171.data
+i195 = m195.data
+i304 = m304.data
+i284 = m284.data
+
+save, i171,i171_h,i195,i195_h,i284,i284_h,i304,i304_h,filename='moses_eit.sav'
+
 
 
 
