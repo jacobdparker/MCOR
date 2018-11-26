@@ -1,0 +1,12 @@
+function linelistmap::init
+  return,1
+end
+
+pro linelistmap__define
+
+  void = {linelistmap, ptr:ptr_new()}
+  return
+
+end
+
+  
