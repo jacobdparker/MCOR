@@ -38,7 +38,18 @@ dt=temp * dlnt
 ;care about, at a constant pressure
 
 ch_synthetic, wmin, wmax, pressure=pressure,logt_isothermal = dem_logt, ioneq_name = ioneq_name,$
-              output = line_list, /no_sum_int
+              output = line_list, /no_sum_int, all = 0
+
+;need to scale line list to abundance file since
+;make_chianti_spec won't do it for /no_sum_int
+
+abund_name = !xuvtop+'/abundance/sun_coronal_1992_feldman.abund'
+read_abund,abund_name,abund,abund_ref
+
+line_abunds = abund[line_list.lines.iz-1]
+line_abunds  = rebin(reform(line_abunds,1,n_elements(line_abunds)),n_elements(line_list.lines[0].int),n_elements(line_abunds))
+line_list.lines[*].int = line_list.lines[*].int * line_abunds[*] 
+
 
 
 
@@ -57,15 +68,18 @@ ch_synthetic, wmin, wmax, pressure=pressure,logt_isothermal = dem_logt, ioneq_na
 meit_ll_map = obj_new('linelistmap')
 meit_ll_map->set_dem_map,dem_map
 meit_ll_map->set_linelist,line_list
+
+restore, 'mosesI_eit_alignment.sav'
+
+foo = meit_ll_map->rebin_dem_map(newdim,newdim,/overwrite)
+foo = meit_ll_map->shift_dem_map(m,/overwrite)
+
 save,meit_ll_map,filename='moses_eit_linelist_map.sav'
 
 obj_destroy,meit_ll_map
 
 
 
-;; STOP
-
-;; save,eit_linelist_map,line_list,filename = 'eit_linelist_map.sav'
 
 
 

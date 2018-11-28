@@ -1,3 +1,7 @@
+;this code pulls in relavant eit_images for the  MOSES I launch,
+;preps, coaligns, rebins, and saves for display in publication
+
+
 restore, 'moses_super.sav'
 
 ; Read in all of the eit image from the MOSES launch
@@ -43,10 +47,13 @@ eit_sz = size(i304)
 scale = i304_h.cdelt1/moses_resolution
 newdim = floor(scale*eit_sz[1])
 
+
 m171 = rebin_map(m171,newdim,newdim)
 m195 = rebin_map(m195,newdim,newdim)
 m284 = rebin_map(m284,newdim,newdim)
 m304 = rebin_map(m304,newdim,newdim)
+
+
 
 ;Co-Align and Modify Maps
 
@@ -80,7 +87,7 @@ y = y[0:2047,0:1023]
 
 save,x,y,filename='mosesI_pointing.sav'
 
-
+save,newdim,m,x,y,filename='mosesI_eit_alignment.sav'
 
 
 ;Display EIT images in the appropriate color scale and save them

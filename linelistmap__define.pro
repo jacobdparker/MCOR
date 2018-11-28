@@ -84,8 +84,21 @@ function linelistmap::scale_dem_map,new_dem,normalize=normalize,overwrite=overwr
   dem_map_sz = size(*(self.dem_map))
  
   if n_elements(new_dem) ne dem_map_sz[3] then begin
-     print,'DEM does not have correct dimensions.'
-     return,-1
+
+     if keyword_set(normalize) then begin
+    
+        median_dem = median(median(*(self.dem_map),dimension=1),dimension=1)
+        new_dem_map -= rebin(reform(median_dem,1,1,dem_map_sz[3]),dem_map_sz[1],dem_map_sz[2],dem_map_sz[3])
+        if keyword_set(overwrite) then self->set_dem_map,new_dem_map
+
+        return,new_dem_map
+        
+     endif else begin
+     
+        print,'DEM does not have correct dimensions.'
+        return,-1
+     end
+     
   end
 
      
@@ -96,7 +109,7 @@ function linelistmap::scale_dem_map,new_dem,normalize=normalize,overwrite=overwr
      new_dem_map -= rebin(reform(median_dem,1,1,dem_map_sz[3]),dem_map_sz[1],dem_map_sz[2],dem_map_sz[3])
   end
 
-  new_dem_map -= rebin(reform(new_dem,1,1,dem_map_sz[3]),dem_map_sz[1],dem_map_sz[2],dem_map_sz[3])
+  new_dem_map += rebin(reform(new_dem,1,1,dem_map_sz[3]),dem_map_sz[1],dem_map_sz[2],dem_map_sz[3])
 
   if keyword_set(overwrite) then self->set_dem_map,new_dem_map
 
@@ -104,7 +117,24 @@ function linelistmap::scale_dem_map,new_dem,normalize=normalize,overwrite=overwr
 
 end
 
+function linelistmap::shift_dem_map,m,dem_map=dem_map,overwrite=overwrite
+  if keyword_set(dem_map) then demmp = dem_map else demmp = *(self.dem_map)
+  shift_dem_map = shift(demmp,[-m(0),-m(1),0])
   
+  if keyword_set(overwrite) then self->set_dem_map,shift_dem_map
+  return,shift_dem_map
+end 
+
+function linelistmap::rebin_dem_map,xdim,ydim,dem_map=dem_map,total=total,overwrite=overwrite
+  if keyword_set(dem_map) then demmp = dem_map else demmp = *(self.dem_map)
+  dem_map_sz = size(demmp)
+  rebin_dem_map = fltarr(xdim,ydim,dem_map_sz[3])
+  for i = 0,dem_map_sz[3]-1 do rebin_dem_map[0,0,i] = frebin(demmp[*,*,i],xdim,ydim,total=total)
+  
+
+  if keyword_set(overwrite) then self->set_dem_map,rebin_dem_map
+  return,rebin_dem_map
+end 
   
 pro linelistmap::cleanup
 ;-- free memory allocated to pointer when destroying object
