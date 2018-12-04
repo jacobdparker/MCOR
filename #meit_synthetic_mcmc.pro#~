@@ -1,0 +1,10 @@
+;This will contain all the code neeeded to take the synthetic meit
+;cube genereated by meit_synthetic and find the best fit to the mean
+;MOSES difference image cross-correlation funtion
+
+function likelihood,param,data
+;apply scaling of param to data
+  param_sz = size(param)
+  data_sz = size(data)
+
+  param = 

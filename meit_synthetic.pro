@@ -9,10 +9,10 @@ ll = meit_ll_map->get_linelist()
 
 
 ;Pair down line list since I don't have all day
-percent_max_int= .01
+percent_max_int= .01 ;with new method I bet I can include every line
 lines_small = ll.lines[where(total(ll.lines.int,1) gt percent_max_int/100*max(total(ll.lines.int,1)))]
 
-STOP
+
 ;read in MOSES throughput data
 openr,1,'mosesI_throughput/filter1.csv'
 filter1 = fltarr(2,300)
@@ -61,27 +61,33 @@ plus_throughput = filter1 * filter2 * grating * secondary_orders(1,*)
 minus_throughput = filter1 * filter2 * grating * secondary_orders(2,*)
 
 
-
+;;;;;;; Note: this method will not work as implemented as the scaling
+;;;;;;; of a DEM basis function cannot be done out side of this
+;;;;;;; procedure.  I don't think there is any operation that
+;;;;;;; will scale an image the same way scaling the DEM in this code does.
 
 ;form DEM basis, for now triangle functions in logt/logdem space
-logt = ll.logt_isothermal
-logt_sz = n_elements(logt)
+;; logt = ll.logt_isothermal
+;; logt_sz = n_elements(logt)
 
-basis_elements = 7
-mag = 15
+;; basis_elements = 7
+;; mag = 15
 
-x = findgen(logt_sz)
-x0 = findgen(basis_elements)/(basis_elements-1)*logt_sz-logt_sz/2.
+;; x = findgen(logt_sz)
+;; x0 = findgen(basis_elements)/(basis_elements-1)*logt_sz-logt_sz/2.
 
 
-dem_basis = fltarr(logt_sz,basis_elements)
-for i = 0,basis_elements-1 do begin
-   dem_basis[0,i] = -abs(2./logt_sz*(x-x0[i])-1)*mag
-end
-dem_basis +=30
+;; dem_basis = fltarr(logt_sz,basis_elements)
+;; for i = 0,basis_elements-1 do begin
+;;    dem_basis[0,i] = -abs(2./logt_sz*(x-x0[i])-1)*mag
+;; end
+;; dem_basis +=30
 
 ;make empty array for building sythetic images
 dem_map_sz = size(meit_ll_map->get_dem_map())
+
+basis_elements = dem_map_sz[3]
+
 moses_synth_cube = fltarr(dem_map_sz[1],dem_map_sz[2],3,basis_elements)
 
 
@@ -97,36 +103,84 @@ dt = temp * dlnt
 
 ;-- rebin and reform to multiply against dem map
 
-dt_len = n_elements(dt)
-dt = rebin(reform(dt,1,1,dt_len),dem_map_sz[1],dem_map_sz[2],dt_len)
+;; dt_len = n_elements(dt)
+;; dt =
+;; rebin(reform(dt,1,1,dt_len),dem_map_sz[1],dem_map_sz[2],dt_len)
+
+;multiply each intensity by dt so you only have to make one int map
+;that is now scaled to be used with a DEM and not EM
+for line_num = 0,n_elements(lines_small)-1 do begin
+   lines_small[line_num].int *= dt
+
+endfor
+
+
 
 pad = fltarr(dem_map_sz[1],dem_map_sz[2]) ;to deal with periodicity of shift
 
 TIC
 ;loop through each line and each dem basis element  
+;; for i=0,basis_elements-1 do begin
+   
+;;    new_dem_map = meit_ll_map->scale_dem_map(dem_basis[*,i],/normalize)
+   
+;;    for j = 0,n_elements(lines_small)-1 do begin
+
+;;       ;; int_map = rebin(reform(ll.lines[j].int,1,1,dt_len),dem_map_sz[1],dem_map_sz[2],dt_len)
+;;       ;; disperse_pix = round(1/.028*(ll.lines(j).wvl-303.7860)) ; caluculate dispersion in pix
+;;       int_map = rebin(reform(lines_small[j].int,1,1,dt_len),dem_map_sz[1],dem_map_sz[2],dt_len)
+;;       disperse_pix = round(1/.028*(lines_small[j].wvl-303.7860)) ; caluculate dispersion in pix
+ 
+;;       img = total(int_map*10.^(new_dem_map)*dt,3)
+      
+;;       ;scale image with MOSESI throughput curves and disperse
+;;       zero = img*zero_throughput(j)
+;;       plus = shift([img*plus_throughput(j),pad],[disperse_pix,0])
+;;       minus = shift([img*minus_throughput(j),pad],[disperse_pix,0])
+
+;;       ;assign to cube.
+;;       moses_synth_cube[0,0,0,i] =  moses_synth_cube[*,*,0,i] + zero
+;;       moses_synth_cube[0,0,1,i] =  moses_synth_cube[*,*,1,i] + plus[0:dem_map_sz[1]-1,*]
+;;       moses_synth_cube[0,0,2,i] =  moses_synth_cube[*,*,2,i] + minus[0:dem_map_sz[1]-1,*]
+
+;;       print,i,j
+      
+;;       TOC
+    
+;;    end
+;; end
+
+
+
+
+;when we use every point in temperature space, this calculation can be
+;done a bit differently and is carried out here.
+
+
+new_dem_map = meit_ll_map->scale_dem_map(/normalize)
+basis_elements = dem_map_sz[3]
+
+
 for i=0,basis_elements-1 do begin
-   new_dem_map = meit_ll_map->scale_dem_map(dem_basis[*,i],/normalize)
    
    for j = 0,n_elements(lines_small)-1 do begin
 
-      ;; int_map = rebin(reform(ll.lines[j].int,1,1,dt_len),dem_map_sz[1],dem_map_sz[2],dt_len)
-      ;; disperse_pix = round(1/.028*(ll.lines(j).wvl-303.7860)) ; caluculate dispersion in pix
-      int_map = rebin(reform(lines_small[j].int,1,1,dt_len),dem_map_sz[1],dem_map_sz[2],dt_len)
+
       disperse_pix = round(1/.028*(lines_small[j].wvl-303.7860)) ; caluculate dispersion in pix
-      
-      img = total(int_map*10.^(new_dem_map)*dt,3)
-      
-      ;scale image with MOSESI throughput curves and disperse
-      zero = img*zero_throughput(j)
-      plus = shift([img*plus_throughput(j),pad],[disperse_pix,0])
-      minus = shift([img*minus_throughput(j),pad],[disperse_pix,0])
 
-      
-      ;assign to cube.
-      moses_synth_cube[0,0,0,i] =  moses_synth_cube[*,*,0,i] + zero
-      moses_synth_cube[0,0,1,i] =  moses_synth_cube[*,*,1,i] + plus[0:dem_map_sz[1]-1,*]
-      moses_synth_cube[0,0,2,i] =  moses_synth_cube[*,*,2,i] + minus[0:dem_map_sz[1]-1,*]
+      if lines_small[j].int[i] ne 0. then begin  ;avoid multiplying a bunch of zeros.
+         img = lines_small[j].int[i]*10.^(new_dem_map[*,*,i])
+         
+                                ;scale image with MOSESI throughput curves and disperse
+         zero = img*zero_throughput(j)
+         plus = shift([img*plus_throughput(j),pad],[disperse_pix,0])
+         minus = shift([img*minus_throughput(j),pad],[disperse_pix,0])
 
+                                ;assign to cube.
+         moses_synth_cube[0,0,0,i] =  moses_synth_cube[*,*,0,i] + zero
+         moses_synth_cube[0,0,1,i] =  moses_synth_cube[*,*,1,i] + plus[0:dem_map_sz[1]-1,*]
+         moses_synth_cube[0,0,2,i] =  moses_synth_cube[*,*,2,i] + minus[0:dem_map_sz[1]-1,*]
+      endif
       print,i,j
       
       TOC
@@ -135,6 +189,6 @@ for i=0,basis_elements-1 do begin
 end
 
 moses_synth_cube = moses_synth_cube[0:2047,0:1023,*,*]
-save, moses_synth_cube,filename="meit_synth_cube.sav"
+save, moses_synth_cube,filename="meit_synth_cube_full.sav"
 
 end

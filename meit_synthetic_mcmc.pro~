@@ -1,0 +1,103 @@
+;This will contain all the code neeeded to take the synthetic meit
+;cube genereated by meit_synthetic and find the best fit to the mean
+;MOSES difference image cross-correlation funtion
+
+function likelihood,param,data,test
+;apply scaling of param to data
+  param_sz = size(param)
+  data_sz = size(data)
+
+;to conserve memory, I am just going to do this in a loop so I
+;don't have to form another massive array.
+  for i = 0,param_sz[-1]-1 do begin
+     data[*,*,*,0] *=10.^param[i]
+  endfor
+
+  data = total(data,4)           ;collapse the param dimension
+
+;divide out the median of each image prior to subtraction
+
+  for i = 0,data_sz[3]-1 do  data[*,*,i] /= median(data[*,*,i])
+
+;compute cc
+  img_sz = size(data[*,*,1])
+  ;form difference images
+  pz = data[*,*,1]-data[*,*,0]
+  mz = data[*,*,2]-data[*,*,0]
+
+  ;mean subtract
+  pz -= make_array(img_sz(1),value=1)#mean(pz,dimension=1)
+  mz -= make_array(img_sz(1),value=1)#mean(mz,dimension=1)
+  
+  ;pad with zeros
+  pz_pad = [pz,fltarr(img_sz(1),img_sz(2))]
+  mz_pad = [mz,fltarr(img_sz(1),img_sz(2))]
+
+
+  f_pz = FFT(pz_pad,dimension=1)
+  f_mz = FFT(mz_pad,dimension=1)
+  test_cor = img_sz(1)*2*FFT(f_pz*conj(f_mz),dimension=1,/inverse)
+
+  test_cor /= ((fltarr(n_elements(pz_pad(*,0)))+1)#sqrt(total(pz^2,1)*total(mz^2,1))) ;normalize cc
+  test_cor = reverse(real_part(test_cor))
+  test_cor = shift(test_cor,[-img_sz(1)+1,0])
+  tcor = mean(test_cor,dimension=2)
+                              
+  error = total((tcor - test)^2)
+     
+
+  return, error
+
+end
+
+
+;----------------------------------------------------------------------------
+;Actual minimization routine, hoping to make this a little more
+;generic.
+
+; likelihood will be a string pointing to the likelihood funtion.
+
+; param is the array of free parameters
+
+; limits is an array the is n_elements(param)x 2 specifying some
+; boundaries in parameter space.
+
+; max_chain_length is when we cut off the Markov Chain if it
+; hasn't converged (convergence criterion TBD so specfiy this
+; so it stops)
+
+; if /random_start is set, initial param values will be ignored and
+; replaced with random params
+
+function jp_mcmc,likelihood,param,data,limits,max_chain_lenth,random_start = random_start
+
+  ;generate number between low and high limit
+  if keyword_set(random_start) then param = randomu(seed,n_elements(param))*(limits[1,*]-limits[0,*])-limits[0,*]
+
+  param_history = param         ;initialize keeping track of the parameters used
+
+  
+  
+
+end
+
+
+;Main driver fo the minimization scheme.  Things to keep in mind,
+;right now parameters are in log, to better match the range of values
+;we expect in DEMs  Should exceed 10 I don't think.
+
+pro meit_synthetic_mcmc
+
+  restore, 'meit_synth_cube.sav'
+  restore, 'mcor.sav'
+  
+  param = fltarr(n_elements(moses_synth_cube[0,0,0,*]))
+  limits = [[param],[param]]
+ 
+
+end
+
+
+
+
+
