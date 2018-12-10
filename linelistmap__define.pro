@@ -86,8 +86,10 @@ function linelistmap::scale_dem_map,new_dem,normalize=normalize,overwrite=overwr
   if n_elements(new_dem) ne dem_map_sz[3] then begin
 
      if keyword_set(normalize) then begin
-    
-        median_dem = median(median(*(self.dem_map),dimension=1),dimension=1)
+
+        medium_dem = fltarr(dem_map_sz[3])
+
+        for i = 0,dem_map_sz[3]-1 do  median_dem = new_dem_map[*,*,i]
      
         new_dem_map -= rebin(reform(median_dem,1,1,dem_map_sz[3]),dem_map_sz[1],dem_map_sz[2],dem_map_sz[3])
         if keyword_set(overwrite) then self->set_dem_map,new_dem_map

@@ -4,7 +4,7 @@
 ; passband. 
 
 
-;list of EIT images from MOSES I lauch
+;list of EIT images from MOSES I launch
 ;; f171 = '/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.190014'
 ;; f195 = '/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.183429'
 ;; f284 = '/home/jake/Documents/MOSES/MCOR/moses_eit/efz20060208.182651'
@@ -17,6 +17,12 @@ restore, 'eit_cube_prepped.sav'
 
 eit_dem_tool,eit_cube,dem_map,dem_logt
 
+
+;originally I thought I shouldn't be modeling the low temp, end
+;but that is causeing a significant lack of He ii.  Going to include
+;it and then hold that part of the DEM Fixed.
+;; dem_map = dem_map[*,*,5:-1]
+;; dem_logt = dem_logt[5:-1]
 
 ;prepare to generate line_lists
 

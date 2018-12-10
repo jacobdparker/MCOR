@@ -9,7 +9,7 @@ ll = meit_ll_map->get_linelist()
 
 
 ;Pair down line list since I don't have all day
-percent_max_int= .01 ;with new method I bet I can include every line
+percent_max_int= .001 ;with new method I bet I can include every line
 lines_small = ll.lines[where(total(ll.lines.int,1) gt percent_max_int/100*max(total(ll.lines.int,1)))]
 
 
@@ -157,14 +157,21 @@ TIC
 ;done a bit differently and is carried out here.
 
 
-new_dem_map = meit_ll_map->scale_dem_map(/normalize)
+new_dem_map = meit_ll_map->get_dem_map()
 basis_elements = dem_map_sz[3]
+
+;find mean DEM to start
+eit_dem = fltarr(basis_elements)
+for i = 0,basis_elements-1 do eit_dem[i] = median(new_dem_map[0:2047,0:1023,i])
+
+;normalize DEM by the average
+
+new_dem_map -= rebin(reform(eit_dem,1,1,basis_elements),dem_map_sz[1],dem_map_sz[2],basis_elements) ;Subtract not Divide when working with Log DEM!!!
 
 
 for i=0,basis_elements-1 do begin
    
    for j = 0,n_elements(lines_small)-1 do begin
-
 
       disperse_pix = round(1/.028*(lines_small[j].wvl-303.7860)) ; caluculate dispersion in pix
 
@@ -173,8 +180,8 @@ for i=0,basis_elements-1 do begin
          
                                 ;scale image with MOSESI throughput curves and disperse
          zero = img*zero_throughput(j)
-         plus = shift([img*plus_throughput(j),pad],[disperse_pix,0])
-         minus = shift([img*minus_throughput(j),pad],[disperse_pix,0])
+         plus = shift([img[0:-1-m[0]-1,*]*plus_throughput(j),pad,img[-1-m[0]:-1,*]*plus_throughput(j)],[-disperse_pix,0])  ;improved padding accounts for the periodicty of shift at the east limb
+         minus = shift([img[0:-1-m[0]-1,*]*minus_throughput(j),pad,img[-1-m[0]:-1,*]*minus_throughput(j)],[disperse_pix,0])
 
                                 ;assign to cube.
          moses_synth_cube[0,0,0,i] =  moses_synth_cube[*,*,0,i] + zero
@@ -188,7 +195,16 @@ for i=0,basis_elements-1 do begin
    end
 end
 
+
 moses_synth_cube = moses_synth_cube[0:2047,0:1023,*,*]
-save, moses_synth_cube,filename="meit_synth_cube_full.sav"
+restore, 'psfs2.sav'
+
+  for i = 0,n_elements(moses_synth_cube[0,0,0,*])-1 do begin
+     moses_synth_cube[0,0,0,i] = convol(moses_synth_cube[*,*,0,i],psfz)
+     moses_synth_cube[0,0,1,i] = convol(moses_synth_cube[*,*,1,i],psfp)
+     moses_synth_cube[0,0,2,i] = convol(moses_synth_cube[*,*,2,i],psfm)
+  endfor
+
+save, moses_synth_cube,eit_dem,filename="meit_synth_cube_full.sav"
 
 end

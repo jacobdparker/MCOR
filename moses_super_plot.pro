@@ -37,9 +37,9 @@ restore,'moses_super.sav'
   
  
 
-  plus.save, "../MCOR_Paper_Overleaf/super_plus.eps"
-  zero.save, "../MCOR_Paper_Overleaf/super_zero.eps"
-  dif_plot.save, "../MCOR_Paper_Overleaf/super_pz.eps"
+  plus.save, "../MCOR_Paper/super_plus.eps"
+  zero.save, "../MCOR_Paper/super_zero.eps"
+  dif_plot.save, "../MCOR_Paper/super_pz.eps"
 
   
 end

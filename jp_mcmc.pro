@@ -10,17 +10,24 @@ function meit_likelihood,param,data,test,tcor = tcor,dif_img=dif_img
   data_temp = data
 ;to conserve memory, I am just going to do this in a loop so I
 ;don't have to form another massive array.
-  for i = 0,param_sz[-1]-1 do begin
+  for i = 0,param_sz[1]-1 do begin
      data_temp[*,*,*,i] *=10.^param[i]
   endfor
 
+
   data_temp = total(data_temp,4)           ;collapse the param dimension
 
-
-  
 ;divide out the median of each image prior to subtraction
 
-  for i = 0,data_sz[3]-1 do  data_temp[*,*,i] /= median(data[*,*,i])
+  for i = 0,data_sz[3]-1 do begin
+     if  median(data_temp[*,*,i]) ne 0. then begin
+        data_temp[*,*,i] /= median(data_temp[*,*,i])
+      
+     endif
+     
+  endfor
+  
+    
 
 ;compute cc
   img_sz = size(data[*,*,1])
@@ -41,15 +48,21 @@ function meit_likelihood,param,data,test,tcor = tcor,dif_img=dif_img
   f_pz = FFT(pz_pad,dimension=1)
   f_mz = FFT(mz_pad,dimension=1)
   test_cor = img_sz(1)*2*FFT(f_pz*conj(f_mz),dimension=1,/inverse)
-  
-  test_cor /= ((fltarr(n_elements(pz_pad(*,0)))+1)#sqrt(total(pz^2,1)*total(mz^2,1))) ;normalize cc
+  normalization = ((fltarr(n_elements(pz_pad(*,0)))+1)#sqrt(total(pz^2,1)*total(mz^2,1)))
+  normalization[where(normalization eq 0)]=1e-6        ;avoid divide by zero error
+  test_cor /= normalization ;normalize cc
   test_cor = reverse(real_part(test_cor))
   test_cor = shift(test_cor,[-img_sz(1)+1,0])
   tcor = mean(test_cor,dimension=2)
-                              
-  error = total((tcor - test)^2)
-    
+  
+  ;;;; to do this properly I do need to have the full DEM be the param
+  ;;;; function, and not perterbations to it.  Back to meit_synthetic
+  ;;;; to re add normalization
 
+  
+  del_squared = total(abs(shift(param,-1)-2*param+shift(param,1)))
+  alpha = 10.
+  error = total((tcor - test)^2) + alpha*del_squared
   return, error
 
 end
@@ -76,7 +89,7 @@ end
 ; if /random_start is set, initial param values will be ignored and
 ; replaced with random params
 
-function jp_mcmc,param,data,limits,max_chain_length,test,random_start = random_start,verbose = verbose
+function jp_mcmc,param,data,limits,max_chain_length,test,width,random_start = random_start,verbose = verbose
 TIC
  
   
@@ -88,55 +101,59 @@ TIC
   error = meit_likelihood(param,data,test) ;initialize the first link in the chain
   print,error
 ;need to do a "burn in" I guess.
-  i = 0
-  burn_length = 100
-  Print,'Burning in!!'
-  while i lt burn_length do begin
-     kick = randomu(seed,n_elements(param))*1-.5 ;random kick between -1 and 1
-     new_param = param+kick
-     ;if kick puts you out of bounds, set it to the line
-     where_less = where(new_param lt limits[*,0])
-     where_more = where(new_param gt limits[*,1])
-     if total(where_less) ne -1 then new_param[where_less]=limits[where_less] 
-     if total(where_more) ne -1 then new_param[where_more]=limits[where_more]
-     new_error = meit_likelihood(new_param,data,test)
-     if new_error lt error[-1] then begin
-        param_history = [[param_history],[new_param]]
-        error = [error,new_error]
-        param = new_param
-        i+=1
-     endif else begin
-        error_ratio = (new_error-error[-1])/new_error
-        does_it_stick = randomu(seed,1)
-        if does_it_stick gt error_ratio then begin
-           error = [error,new_error]
-           param_history = [[param_history],[new_param]]
-           param = new_param
-           i += 1
+  ;; i = 0
+  ;; burn_length = 100
+  ;; Print,'Burning in!!'
+  ;; while i lt burn_length do begin
+  ;;    width = 1. 
+  ;;    kick = randomu(seed,n_elements(param))*width-width/2 ;random kick between -1 and 1
+  ;;    new_param = param+kick
+  ;;    new_param = smooth(new_param,3)
+  ;;    ;if kick puts you out of bounds, set it to the line
+  ;;    where_less = where(new_param lt limits[*,0])
+  ;;    where_more = where(new_param gt limits[*,1])
+  ;;    if total(where_less) ne -1 then new_param[where_less]=limits[where_less] 
+  ;;    if total(where_more) ne -1 then new_param[where_more]=limits[where_more]
+  ;;    new_error = meit_likelihood(new_param,data,test)
+  ;;    if new_error lt error[-1] then begin
+  ;;       param_history = [[param_history],[new_param]]
+  ;;       error = [error,new_error]
+  ;;       param = new_param
+  ;;       i+=1
+  ;;    endif else begin
+  ;;       error_ratio = (new_error-error[-1])/new_error
+  ;;       does_it_stick = randomu(seed,1)
+  ;;       if does_it_stick gt error_ratio then begin
+  ;;          error = [error,new_error]
+  ;;          param_history = [[param_history],[new_param]]
+  ;;          param = new_param
+  ;;          i += 1
            
-        endif else print,"Parameters Rejected"
-        ;If you get here that means new error was rejected
-     endelse
+  ;;       endif else print,"Parameters Rejected"
+  ;;       ;If you get here that means new error was rejected
+  ;;    endelse
         
         
-     if keyword_set(verbose) then begin
-        print,new_error
-        print,burn_length-i
-        TOC
-     endif
-  endwhile
+  ;;    if keyword_set(verbose) then begin
+  ;;       print,new_error
+  ;;       print,burn_length-i
+  ;;       TOC
+  ;;    endif
+  ;; endwhile
 
   
-  param_history = param_history[*,where(error eq min(error))]
-  param = param_history
-  error = error[where(error eq min(error))]
+  ;; param_history = param_history[*,where(error eq min(error))]
+  ;; param = param_history
+  ;; error = error[where(error eq min(error))]
   
   
   i=0
   
   while i lt max_chain_length do begin
-  
-     kick = randomu(seed,n_elements(param))*.2-.05 ;random kick between -.1 and .1
+    
+     ;; kick = randomu(seed,n_elements(param))*width-width/2
+      kick = randomn(seed,n_elements(param))*width
+     
      new_param = param+kick
      ;if kick puts you out of bounds, set it to the line
      where_less = where(new_param lt limits[*,0])

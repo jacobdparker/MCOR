@@ -144,8 +144,8 @@ cc_pzmz_plot.set_ylabel('Cross-Correlation')
 
 #label all the figures
 fig1.text(0,.9,'b)')
-fig2.text(0,.9,'a)')
-fig3.text(0,.9,'c)')
+fig2.text(0,.9,'c)')
+fig3.text(0,.9,'a)')
 fig4.text(0,.9,'d)')
 fig5.text(0,.9,'e)')
 fig6.text(0,.9,'d)')
