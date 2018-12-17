@@ -13,19 +13,24 @@ TIC
  
 
   limits = [[param],[param]]
-  limits[*,0]=20               ;ten orders of magnitude difference between dem basis
+  limits[*,0]=15               ;ten orders of magnitude difference between dem basis
   limits[*,1]=26
 
-  fixd = 5
-  ;; limits[0:fixd,0] = param[0:fixd]
-  ;; limits[0:fixd,1] = param[0:fixd]
+  fixd = 1
+  limits[0:fixd,0] = param[0:fixd]
+  limits[0:fixd,1] = param[0:fixd]
 
-  limits[0:fixd,0] =0
-  limits[0:fixd,1] = 0
-  
+  param[0:6] += 3.55
+
+  param[20] += .75
+
+  param[15] -= 2.5
+
+
  
-  max_chain_length = 00
-  width = 1.
+ 
+  max_chain_length = 0
+  width = .25
 
   
   data = moses_synth_cube
@@ -37,7 +42,7 @@ TIC
 
   cd, current=dir
 
-  n_proc = 1
+  n_proc = 0
 
   if n_proc gt 1 then begin
      
@@ -47,7 +52,7 @@ TIC
                                 ;needed for any code like this
         br2[i] = IDL_IDLbridge()
         br2[i]->SetVar,'dir',dir
-        br2[i]->Execute,'cd,dir'
+        br2[i]->Execute,'c  param[24] += 10d,dir'
         br2[i]->SetVar,'!path',!path
 
                                 ;MCMC specficic initialize inputs

@@ -168,7 +168,7 @@ for i = 0,basis_elements-1 do eit_dem[i] = median(new_dem_map[0:2047,0:1023,i])
 
 new_dem_map -= rebin(reform(eit_dem,1,1,basis_elements),dem_map_sz[1],dem_map_sz[2],basis_elements) ;Subtract not Divide when working with Log DEM!!!
 
-
+restore, 'mosesI_eit_alignment.sav'
 for i=0,basis_elements-1 do begin
    
    for j = 0,n_elements(lines_small)-1 do begin

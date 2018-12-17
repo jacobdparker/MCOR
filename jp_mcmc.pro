@@ -54,15 +54,13 @@ function meit_likelihood,param,data,test,tcor = tcor,dif_img=dif_img
   test_cor = reverse(real_part(test_cor))
   test_cor = shift(test_cor,[-img_sz(1)+1,0])
   tcor = mean(test_cor,dimension=2)
-  
-  ;;;; to do this properly I do need to have the full DEM be the param
-  ;;;; function, and not perterbations to it.  Back to meit_synthetic
-  ;;;; to re add normalization
+ 
 
+                                ;going to implement a real chi squared test for this
+  normalization = total((tcor-mean(tcor))^2)
+  error = total((test-tcor)^2)
+  error = error/normalization
   
-  del_squared = total(abs(shift(param,-1)-2*param+shift(param,1)))
-  alpha = 10.
-  error = total((tcor - test)^2) + alpha*del_squared
   return, error
 
 end
