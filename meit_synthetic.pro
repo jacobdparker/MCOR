@@ -1,6 +1,7 @@
-;take a linelist map object and build synthetic MOSES plus, minus, and
+;Take a linelist map object and build synthetic MOSES plus, minus, and
 ;zero orders for a given dem basis
 
+;moses_eit_linelist_map.sav created by moses_eit_linelist_map
 restore, "moses_eit_linelist_map.sav"
 
 ll = meit_ll_map->get_linelist()
@@ -9,9 +10,13 @@ ll = meit_ll_map->get_linelist()
 
 
 ;Pair down line list since I don't have all day
-percent_max_int= .001 ;with new method I bet I can include every line
-lines_small = ll.lines[where(total(ll.lines.int,1) gt percent_max_int/100*max(total(ll.lines.int,1)))]
-
+percent_max_int= 25 ;with new method I bet I can include every line
+max_int = max(total(ll.lines.int,1))
+print,max_int
+print,where(total(ll.lines.int,1) gt percent_max_int/100.*max_int)
+lines_small = ll.lines[where(total(ll.lines.int,1) gt percent_max_int/100.*max_int)]
+print,n_elements(lines_small)
+STOP
 
 ;read in MOSES throughput data
 openr,1,'mosesI_throughput/filter1.csv'
@@ -111,50 +116,12 @@ dt = temp * dlnt
 ;that is now scaled to be used with a DEM and not EM
 for line_num = 0,n_elements(lines_small)-1 do begin
    lines_small[line_num].int *= dt
-
 endfor
 
 
 
 pad = fltarr(dem_map_sz[1],dem_map_sz[2]) ;to deal with periodicity of shift
 
-TIC
-;loop through each line and each dem basis element  
-;; for i=0,basis_elements-1 do begin
-   
-;;    new_dem_map = meit_ll_map->scale_dem_map(dem_basis[*,i],/normalize)
-   
-;;    for j = 0,n_elements(lines_small)-1 do begin
-
-;;       ;; int_map = rebin(reform(ll.lines[j].int,1,1,dt_len),dem_map_sz[1],dem_map_sz[2],dt_len)
-;;       ;; disperse_pix = round(1/.028*(ll.lines(j).wvl-303.7860)) ; caluculate dispersion in pix
-;;       int_map = rebin(reform(lines_small[j].int,1,1,dt_len),dem_map_sz[1],dem_map_sz[2],dt_len)
-;;       disperse_pix = round(1/.028*(lines_small[j].wvl-303.7860)) ; caluculate dispersion in pix
- 
-;;       img = total(int_map*10.^(new_dem_map)*dt,3)
-      
-;;       ;scale image with MOSESI throughput curves and disperse
-;;       zero = img*zero_throughput(j)
-;;       plus = shift([img*plus_throughput(j),pad],[disperse_pix,0])
-;;       minus = shift([img*minus_throughput(j),pad],[disperse_pix,0])
-
-;;       ;assign to cube.
-;;       moses_synth_cube[0,0,0,i] =  moses_synth_cube[*,*,0,i] + zero
-;;       moses_synth_cube[0,0,1,i] =  moses_synth_cube[*,*,1,i] + plus[0:dem_map_sz[1]-1,*]
-;;       moses_synth_cube[0,0,2,i] =  moses_synth_cube[*,*,2,i] + minus[0:dem_map_sz[1]-1,*]
-
-;;       print,i,j
-      
-;;       TOC
-    
-;;    end
-;; end
-
-
-
-
-;when we use every point in temperature space, this calculation can be
-;done a bit differently and is carried out here.
 
 
 new_dem_map = meit_ll_map->get_dem_map()
@@ -169,6 +136,7 @@ for i = 0,basis_elements-1 do eit_dem[i] = median(new_dem_map[0:2047,0:1023,i])
 new_dem_map -= rebin(reform(eit_dem,1,1,basis_elements),dem_map_sz[1],dem_map_sz[2],basis_elements) ;Subtract not Divide when working with Log DEM!!!
 
 restore, 'mosesI_eit_alignment.sav'
+TIC
 for i=0,basis_elements-1 do begin
    
    for j = 0,n_elements(lines_small)-1 do begin
@@ -182,6 +150,7 @@ for i=0,basis_elements-1 do begin
          zero = img*zero_throughput(j)
          plus = shift([img[0:-1-m[0]-1,*]*plus_throughput(j),pad,img[-1-m[0]:-1,*]*plus_throughput(j)],[-disperse_pix,0])  ;improved padding accounts for the periodicty of shift at the east limb
          minus = shift([img[0:-1-m[0]-1,*]*minus_throughput(j),pad,img[-1-m[0]:-1,*]*minus_throughput(j)],[disperse_pix,0])
+
 
                                 ;assign to cube.
          moses_synth_cube[0,0,0,i] =  moses_synth_cube[*,*,0,i] + zero
@@ -197,8 +166,10 @@ end
 
 
 moses_synth_cube = moses_synth_cube[0:2047,0:1023,*,*]
+
 restore, 'psfs2.sav'
 
+    ;note, this process introduces zeros around the image edge
   for i = 0,n_elements(moses_synth_cube[0,0,0,*])-1 do begin
      moses_synth_cube[0,0,0,i] = convol(moses_synth_cube[*,*,0,i],psfz)
      moses_synth_cube[0,0,1,i] = convol(moses_synth_cube[*,*,1,i],psfp)

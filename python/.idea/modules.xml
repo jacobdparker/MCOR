@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../../Kankelborg Group/KSO/KSO_III/Engineering/ESIS/Optics/All/Assembly/.idea/Assembly.iml" filepath="$PROJECT_DIR$/../../../Kankelborg Group/KSO/KSO_III/Engineering/ESIS/Optics/All/Assembly/.idea/Assembly.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/python.iml" filepath="$PROJECT_DIR$/.idea/python.iml" />
     </modules>
   </component>

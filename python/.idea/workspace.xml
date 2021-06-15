@@ -6,20 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="b1c0ff71-6b2a-4737-9e0d-dcf270b29816" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/../jp_mcmc.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../jp_mcmc.pro" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../meit_synthetic.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../meit_synthetic.pro" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../meit_synthetic_mcmc.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../meit_synthetic_mcmc.pro" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../moses_eit_linelist_map.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../moses_eit_linelist_map.pro" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../moses_super_plot.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../moses_super_plot.pro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/python.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/python.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fig1.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/fig1.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fig2.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/fig2.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fig3.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/fig3.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fig4.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/fig4.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fig5.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/fig5.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fig6.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/fig6.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fig7.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/fig7.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fig8.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/fig8.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mcor_cartoon.py" beforeDir="false" afterPath="$PROJECT_DIR$/mcor_cartoon.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,44 +18,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/mcor_cartoon.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="901">
-              <caret line="147" column="17" selection-start-line="147" selection-start-column="17" selection-end-line="147" selection-end-column="17" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/MCOR_cartoon_widget.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2552">
-              <caret line="90" selection-start-line="90" selection-end-line="91" selection-end-column="53" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slider_widget_example.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="26" column="33" selection-start-line="26" selection-start-column="33" selection-end-line="26" selection-end-column="33" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -86,8 +39,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="width" value="1916" />
-    <option name="height" value="2105" />
+    <option name="x" value="1918" />
+    <option name="y" value="-19" />
+    <option name="width" value="1924" />
+    <option name="height" value="1072" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -97,7 +52,7 @@
     <panes />
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="/media/jake/Media/Documents/Research/Kankelborg Group/KSO/KSO-III/Engineering/ESIS/Optics/All/Assembly" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../Kankelborg Group/KSO/KSO_III/Engineering/ESIS/Optics/All/Assembly" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.appearance" />
   </component>
   <component name="RunDashboard">
@@ -247,9 +202,19 @@
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/MCOR_cartoon.py" />
+    <entry file="file://$PROJECT_DIR$/mcor_cartoon.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="901">
+          <caret line="147" column="17" selection-start-line="147" selection-start-column="17" selection-end-line="147" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/MCOR_cartoon_widget.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2552">
+        <state relative-caret-position="1597">
           <caret line="90" selection-start-line="90" selection-end-line="91" selection-end-column="53" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -259,20 +224,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/slider_widget_example.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
+        <state relative-caret-position="667">
           <caret line="26" column="33" selection-start-line="26" selection-start-column="33" selection-end-line="26" selection-end-column="33" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mcor_cartoon.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="901">
-          <caret line="147" column="17" selection-start-line="147" selection-start-column="17" selection-end-line="147" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

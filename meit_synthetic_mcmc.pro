@@ -1,25 +1,29 @@
 
 
-;Main driver fo the minimization scheme.  Things to keep in mind,
-;right now parameters are in log, to better match the range of values
-;we expect in DEMs  Should not exceed 10 I don't think.
+;Main driver for the minimization scheme.
+
+;Instructions
+; .compile jp_mcmc
+; .r meit_synthetic_mcmc
 TIC
 
-  restore, 'meit_synth_cube_full.sav'
+  restore, 'meit_synth_cube_full.sav' ;created by meit_synthetic
   restore, 'mcor.sav'
  
 
   param = eit_dem
  
-
+  ;set the bounds for each bin in LOG DEM space
   limits = [[param],[param]]
-  limits[*,0]=15               ;ten orders of magnitude difference between dem basis
-  limits[*,1]=26
+  limits[*,0]=15               
+  limits[*,1]=30
 
-  fixd = 1
-  limits[0:fixd,0] = param[0:fixd]
-  limits[0:fixd,1] = param[0:fixd]
+  ;; fixd = 0
+  ;; limits[0:fixd,0] = param[0:fixd]
+  ;; limits[0:fixd,1] = param[0:fixd]
 
+
+  ;some manual guessing to get us started
   param[0:6] += 3.55
 
   param[20] += .75
@@ -29,20 +33,21 @@ TIC
 
  
  
-  max_chain_length = 0
-  width = .25
+  max_chain_length = 10000
+  width = .5
 
   
   data = moses_synth_cube
   test = mcor
-                                ;restore,'mcmc_goodfit.sav'
+  STOP
+                            
 
 
 
 
   cd, current=dir
 
-  n_proc = 0
+  n_proc = 4
 
   if n_proc gt 1 then begin
      
@@ -52,7 +57,7 @@ TIC
                                 ;needed for any code like this
         br2[i] = IDL_IDLbridge()
         br2[i]->SetVar,'dir',dir
-        br2[i]->Execute,'c  param[24] += 10d,dir'
+        br2[i]->Execute,'cd ,dir'
         br2[i]->SetVar,'!path',!path
 
                                 ;MCMC specficic initialize inputs
@@ -64,7 +69,7 @@ TIC
         br2[i]->SetVar,'width',width
         
                                 ;Run Chain
-        br2[i]->Execute,'fit = jp_mcmc(param,data,limits,max_chain_length,test,width,/verbose)',/nowait
+        br2[i]->Execute,'fit = jp_mcmc(param,data,limits,max_chain_length,test,width,/verbose,/random_start)',/nowait
      endfor
 
                                 ;Monitor Chain Status
@@ -74,6 +79,7 @@ TIC
         for i=0, n_proc-1 do begin
            status[i] = br2[i]->Status()
         endfor
+        
      endwhile
 
      br2[0]->Execute,'error_history = fit.error_history'
@@ -100,7 +106,7 @@ TIC
      
   endif else begin
      
-     fit = jp_mcmc(param,data,limits,max_chain_length,test,width,/verbose)
+     fit = jp_mcmc(param,data,limits,max_chain_length,test,width,/verbose,/random_start)
      lowest_error = min(fit.error_history)
   endelse 
   
@@ -126,7 +132,7 @@ TIC
 
 
 
-  print,'Lowest Error  =',error
+  print,'Lowest Error  =', error
 
   restore,'mosesI_pointing.sav' 
   
@@ -148,6 +154,8 @@ TIC
   cc_plot.ytitle = 'Correlation'
   cc_plot.xrange = [-1950,1950]
 
+TOC
+  
   ;save plots
   ;; dif_plot.save, "../AGU_2018/figures/modeled_pz.eps"
   ;; cc_plot.save,  "../AGU_2018/figures/cc_comp.eps"

@@ -12,7 +12,7 @@
 
 
 ;read in EIT images and build a dem map
-
+; 'eit_cube_prepped.sav is produced by moses_eit'
 restore, 'eit_cube_prepped.sav'
 
 eit_dem_tool,eit_cube,dem_map,dem_logt
@@ -29,7 +29,7 @@ eit_dem_tool,eit_cube,dem_map,dem_logt
 wmin = 280
 wmax = 340
 pressure = 1e15
-ioneq_name = '/usr/local/ssw/packages/chianti/dbase/ioneq/chianti.ioneq'
+ioneq_name = '/usr/local/ssw/packages/chianti/dbase/ioneq/chianti.ioneq';obviously matters where you installed chianti
 
 ;since ch_synthetic uses EM and not DEM in Isothermal mode we need to
 ;prepare an array of dt to multiply intensities before
@@ -49,7 +49,7 @@ ch_synthetic, wmin, wmax, pressure=pressure,logt_isothermal = dem_logt, ioneq_na
 ;need to scale line list to abundance file since
 ;make_chianti_spec won't do it for /no_sum_int
 
-abund_name = !xuvtop+'/abundance/sun_coronal_1992_feldman.abund'
+abund_name = !xuvtop+'/abundance/sun_coronal_1992_feldman.abund' ;another variable internal to chianti
 read_abund,abund_name,abund,abund_ref
 
 line_abunds = abund[line_list.lines.iz-1]
@@ -75,7 +75,7 @@ meit_ll_map = obj_new('linelistmap')
 meit_ll_map->set_dem_map,dem_map
 meit_ll_map->set_linelist,line_list
 
-restore, 'mosesI_eit_alignment.sav'
+restore, 'mosesI_eit_alignment.sav'  ;apparently this file just store lag numbers for aligning to EIT?
 
 foo = meit_ll_map->rebin_dem_map(newdim,newdim,/overwrite)
 foo = meit_ll_map->shift_dem_map(m,/overwrite)

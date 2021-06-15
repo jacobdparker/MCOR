@@ -1,6 +1,6 @@
-;This will contain all the code neeeded to take the synthetic meit
-;cube genereated by meit_synthetic and find the best fit to the mean
-;MOSES difference image cross-correlation funtion
+; This will contain all the code needed to take the synthetic meit
+; cube genereated by meit_synthetic and find the best fit to the mean
+; MOSES difference image cross-correlation funtion
 
 function meit_likelihood,param,data,test,tcor = tcor,dif_img=dif_img
 ;apply scaling of param to data
@@ -25,7 +25,7 @@ function meit_likelihood,param,data,test,tcor = tcor,dif_img=dif_img
       
      endif
      
-  endfor
+endfor
   
     
 
@@ -55,13 +55,13 @@ function meit_likelihood,param,data,test,tcor = tcor,dif_img=dif_img
   test_cor = shift(test_cor,[-img_sz(1)+1,0])
   tcor = mean(test_cor,dimension=2)
  
-
-                                ;going to implement a real chi squared test for this
-  normalization = total((tcor-mean(tcor))^2)
-  error = total((test-tcor)^2)
-  error = error/normalization
   
+  error = total(abs(tcor-test))
+  ;/total(abs(tcor))
+  
+    
   return, error
+
 
 end
 
@@ -88,62 +88,19 @@ end
 ; replaced with random params
 
 function jp_mcmc,param,data,limits,max_chain_length,test,width,random_start = random_start,verbose = verbose
-TIC
+    TIC
  
   
-  ;generate number between low and high limit
-  if keyword_set(random_start) then param = randomu(seed,n_elements(param))*(limits[*,1]-limits[*,0])+limits[*,0]
+    ;generate number between low and high limit
+    if keyword_set(random_start) then param = randomu(seed,n_elements(param))*(limits[*,1]-limits[*,0])+limits[*,0]
 
-  param_history = param         ;initialize keeping track of the parameters used
-  
-  error = meit_likelihood(param,data,test) ;initialize the first link in the chain
-  print,error
-;need to do a "burn in" I guess.
-  ;; i = 0
-  ;; burn_length = 100
-  ;; Print,'Burning in!!'
-  ;; while i lt burn_length do begin
-  ;;    width = 1. 
-  ;;    kick = randomu(seed,n_elements(param))*width-width/2 ;random kick between -1 and 1
-  ;;    new_param = param+kick
-  ;;    new_param = smooth(new_param,3)
-  ;;    ;if kick puts you out of bounds, set it to the line
-  ;;    where_less = where(new_param lt limits[*,0])
-  ;;    where_more = where(new_param gt limits[*,1])
-  ;;    if total(where_less) ne -1 then new_param[where_less]=limits[where_less] 
-  ;;    if total(where_more) ne -1 then new_param[where_more]=limits[where_more]
-  ;;    new_error = meit_likelihood(new_param,data,test)
-  ;;    if new_error lt error[-1] then begin
-  ;;       param_history = [[param_history],[new_param]]
-  ;;       error = [error,new_error]
-  ;;       param = new_param
-  ;;       i+=1
-  ;;    endif else begin
-  ;;       error_ratio = (new_error-error[-1])/new_error
-  ;;       does_it_stick = randomu(seed,1)
-  ;;       if does_it_stick gt error_ratio then begin
-  ;;          error = [error,new_error]
-  ;;          param_history = [[param_history],[new_param]]
-  ;;          param = new_param
-  ;;          i += 1
-           
-  ;;       endif else print,"Parameters Rejected"
-  ;;       ;If you get here that means new error was rejected
-  ;;    endelse
-        
-        
-  ;;    if keyword_set(verbose) then begin
-  ;;       print,new_error
-  ;;       print,burn_length-i
-  ;;       TOC
-  ;;    endif
-  ;; endwhile
+    param_history = param         ;initialize keeping track of the parameters used
 
-  
-  ;; param_history = param_history[*,where(error eq min(error))]
-  ;; param = param_history
-  ;; error = error[where(error eq min(error))]
-  
+    error = meit_likelihood(param,data,test) ;initialize the first link in the chain
+    print,error
+
+
+
   
   i=0
   
@@ -161,13 +118,13 @@ TIC
      new_error = meit_likelihood(new_param,data,test)
      
      print,new_error
-     if new_error lt error[-1] then begin
+    if new_error lt error[-1] then begin
         error = [error,new_error]
         param_history = [[param_history],[new_param]]
         param = new_param
         i += 1
         
-        endif else begin
+    endif else begin
         error_ratio = (new_error-error[-1])/new_error
         does_it_stick = randomu(seed,1)
         
